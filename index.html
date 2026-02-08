@@ -2,45 +2,28 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Sistema de Gestão: Completo com Metas e Histórico</title>
+    <title>Sistema de Gestão - Segurança Ativada</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f0f2f5; color: #333; }
         .container { max-width: 1200px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h2, h3 { color: #0056b3; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 30px; }
-        
-        /* Alerta de indicação */
         .alerta-indicacao { background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 20px; display: none; border: 1px solid #c3e6cb; }
-
-        /* Formulário de Cadastro */
         .form-group { display: grid; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; }
         .grid-campos { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; }
         input, button, select { padding: 12px; border-radius: 6px; border: 1px solid #ddd; font-size: 15px; }
         button { background-color: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
         button:hover { background-color: #0056b3; }
-        
-        /* Link de Convite */
         .area-link { background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 10px 0; display: none; border: 1px solid #b2d7ff; }
-        
-        /* Filtros e Tabela Principal */
         .filtro-secao { background: #e9ecef; padding: 15px; border-radius: 8px; margin-top: 20px; display: flex; align-items: center; gap: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; background: white; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
         th { background: #0056b3; color: white; }
-        
-        /* Status Ativo/Inativo */
         .status-ativo { background-color: #28a745; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
         .status-inativo { background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
         .badge-lider { background: #6f42c1; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
-
-        /* Botões de Ação */
         .btn-confirmar { background-color: #28a745; font-size: 11px; padding: 5px 8px; margin-right: 5px; }
         .btn-excluir { background-color: #dc3545; font-size: 11px; padding: 5px 8px; }
-
-        /* Seção de Eventos (Amarela) */
         .secao-eventos { background: #fff3cd; padding: 20px; border-radius: 8px; border: 1px solid #ffeeba; margin-top: 40px; }
-        .input-evento { width: 98%; margin-bottom: 15px; border: 2px solid #ffeeba; font-weight: bold; color: #856404; }
-
-        /* Seção de Histórico (Azul) */
         .secao-historico { background: #d1ecf1; padding: 20px; border-radius: 8px; border: 1px solid #bee5eb; margin-top: 40px; }
         .item-historico { background: white; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 5px solid #17a2b8; display: flex; justify-content: space-between; align-items: center; }
     </style>
@@ -48,7 +31,7 @@
 <body>
 
 <div class="container">
-    <h2>🚀 Gestão de Equipe e Cadastro Geral</h2>
+    <h2>🚀 Gestão de Equipe (Link por Nome)</h2>
 
     <div id="alertaRef" class="alerta-indicacao">
         📢 Você está entrando através do convite de: <strong id="nomeIndicador">...</strong>
@@ -66,7 +49,7 @@
     </div>
 
     <div id="areaLink" class="area-link">
-        <strong>🔗 Link de Convite para o novo membro:</strong> <br>
+        <strong>🔗 Link de Convite Seguro:</strong> <br>
         <span id="linkGerado" style="word-break: break-all; color: #0056b3; font-family: monospace;"></span>
         <button onclick="copiarLink()" style="padding: 5px; font-size: 11px; background: #28a745; margin-left: 10px;">Copiar Link</button>
     </div>
@@ -93,25 +76,21 @@
     </table>
 
     <div class="secao-eventos">
-        <h3>🎉 Controle de Evento Atual</h3>
-        <label><b>Nome da Festa ou Evento:</b></label><br>
-        <input type="text" id="nomeDaFesta" class="input-evento" placeholder="Ex: Grande Reunião de Domingo" oninput="localStorage.setItem('nomeFestaSalvo', this.value)">
-        
-        <div style="font-weight: bold; margin-bottom: 10px;">Pessoas Confirmadas: <span id="numConfirmados">0</span></div>
+        <h3>🎉 Evento Atual</h3>
+        <input type="text" id="nomeDaFesta" style="width: 98%; margin-bottom: 15px;" placeholder="Nome da Festa" oninput="localStorage.setItem('nomeFestaSalvo', this.value)">
+        <div style="font-weight: bold; margin-bottom: 10px;">Confirmados: <span id="numConfirmados">0</span></div>
         <table id="tabelaEvento">
-            <thead>
-                <tr><th>Nome</th><th>Cidade</th><th>Título</th><th>Ação</th></tr>
-            </thead>
+            <thead><tr><th>Nome</th><th>Cidade</th><th>Ação</th></tr></thead>
             <tbody></tbody>
         </table>
         <div style="margin-top: 15px;">
-            <button onclick="fecharESalvarEvento()" style="background-color: #17a2b8;">💾 Finalizar e Salvar no Histórico</button>
-            <button onclick="exportarExcel()" style="background-color: #1d6f42;">📥 Exportar Excel</button>
+            <button onclick="fecharESalvarEvento()" style="background-color: #17a2b8;">💾 Salvar Histórico</button>
+            <button onclick="exportarExcel()" style="background-color: #1d6f42;">📥 Excel</button>
         </div>
     </div>
 
     <div class="secao-historico">
-        <h3>📜 Histórico de Eventos Passados</h3>
+        <h3>📜 Histórico</h3>
         <div id="listaHistorico"></div>
     </div>
 </div>
@@ -120,36 +99,51 @@
     let bancoPessoas = JSON.parse(localStorage.getItem('bancoPessoas')) || [];
     let listaEvento = JSON.parse(localStorage.getItem('listaEvento')) || [];
     let historicoEventos = JSON.parse(localStorage.getItem('historicoEventos')) || [];
-    
-    document.getElementById('nomeDaFesta').value = localStorage.getItem('nomeFestaSalvo') || "";
 
     const urlParams = new URLSearchParams(window.location.search);
     const refDoLink = urlParams.get('ref');
 
     if (refDoLink) {
-        const indicador = bancoPessoas.find(p => p.titulo === refDoLink);
+        const indicador = bancoPessoas.find(p => criarSlug(p.nome) === refDoLink);
         if (indicador) {
             document.getElementById('alertaRef').style.display = 'block';
             document.getElementById('nomeIndicador').innerText = indicador.nome;
         }
     }
 
+    function criarSlug(nome) {
+        return nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
+    }
+
     function cadastrar() {
-        const nome = document.getElementById('nome').value;
+        const nome = document.getElementById('nome').value.trim();
         const cidade = document.getElementById('cidade').value;
         const titulo = document.getElementById('titulo').value;
         const zona = document.getElementById('zona').value;
         const secao = document.getElementById('secao').value;
 
-        if (!nome || !titulo || !zona || !secao) return alert("Preencha todos os campos!");
-        if (bancoPessoas.some(p => p.titulo === titulo)) return alert("Título já cadastrado!");
+        if (!nome || !titulo) return alert("Nome e Título são obrigatórios!");
+        
+        const slugNome = criarSlug(nome);
+        if (bancoPessoas.some(p => criarSlug(p.nome) === slugNome)) {
+            return alert("Este nome já possui um link ativo ou é muito similar a um existente!");
+        }
 
-        const novoMembro = { nome, cidade, titulo, zona, secao, indicadoPor: refDoLink || "direto" };
+        const novoMembro = { 
+            nome, 
+            cidade, 
+            titulo, 
+            zona, 
+            secao, 
+            indicadoPor: refDoLink || "direto",
+            slug: slugNome 
+        };
+
         bancoPessoas.push(novoMembro);
         localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
 
         const urlBase = window.location.href.split('?')[0];
-        document.getElementById('linkGerado').innerText = `${urlBase}?ref=${titulo}`;
+        document.getElementById('linkGerado').innerText = `${urlBase}?ref=${slugNome}`;
         document.getElementById('areaLink').style.display = 'block';
 
         popularFiltroLideres();
@@ -158,7 +152,7 @@
     }
 
     function excluirMembro(titulo) {
-        if(confirm("Tem certeza que deseja excluir este membro permanentemente?")) {
+        if(confirm("Excluir este membro?")) {
             bancoPessoas = bancoPessoas.filter(p => p.titulo !== titulo);
             localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
             popularFiltroLideres();
@@ -168,11 +162,11 @@
 
     function popularFiltroLideres() {
         const select = document.getElementById('selectLider');
-        select.innerHTML = '<option value="todos">-- Mostrar Todos --</option><option value="direto">Sem Líder (Diretos)</option>';
+        select.innerHTML = '<option value="todos">-- Todos --</option><option value="direto">Sem Líder</option>';
         const lideresUnicos = [...new Set(bancoPessoas.map(p => p.indicadoPor))].filter(r => r !== 'direto');
-        lideresUnicos.forEach(tLider => {
-            const l = bancoPessoas.find(p => p.titulo === tLider);
-            if(l) select.innerHTML += `<option value="${tLider}">Equipe de: ${l.nome}</option>`;
+        lideresUnicos.forEach(slugLider => {
+            const l = bancoPessoas.find(p => p.slug === slugLider);
+            if(l) select.innerHTML += `<option value="${slugLider}">Equipe de: ${l.nome}</option>`;
         });
     }
 
@@ -180,13 +174,12 @@
         const tbody = document.querySelector('#tabelaDados tbody');
         const filtro = document.getElementById('selectLider').value;
         tbody.innerHTML = "";
-
         let lista = (filtro === 'todos') ? bancoPessoas : bancoPessoas.filter(p => p.indicadoPor === filtro);
 
         lista.forEach(p => {
-            const countIndicados = bancoPessoas.filter(m => m.indicadoPor === p.titulo).length;
+            const countIndicados = bancoPessoas.filter(m => m.indicadoPor === p.slug).length;
             const statusHtml = countIndicados >= 10 ? '<span class="status-ativo">ATIVO</span>' : '<span class="status-inativo">INATIVO</span>';
-            const lider = bancoPessoas.find(l => l.titulo === p.indicadoPor);
+            const lider = bancoPessoas.find(l => l.slug === p.indicadoPor);
 
             const linha = tbody.insertRow();
             linha.innerHTML = `
@@ -224,26 +217,21 @@
         document.getElementById('numConfirmados').innerText = listaEvento.length;
         listaEvento.forEach(p => {
             const linha = tbody.insertRow();
-            linha.innerHTML = `<td>${p.nome}</td><td>${p.cidade}</td><td>${p.titulo}</td>
+            linha.innerHTML = `<td>${p.nome}</td><td>${p.cidade}</td>
             <td><button class="btn-excluir" onclick="removerPresencaAtual('${p.titulo}')">Remover</button></td>`;
         });
     }
 
     function fecharESalvarEvento() {
         const nome = document.getElementById('nomeDaFesta').value;
-        if(!nome || listaEvento.length === 0) return alert("Dê um nome ao evento e adicione pessoas!");
-        
+        if(!nome || listaEvento.length === 0) return alert("Dê um nome e adicione pessoas!");
         historicoEventos.push({ id: Date.now(), nome: nome, data: new Date().toLocaleString(), participantes: [...listaEvento] });
         localStorage.setItem('historicoEventos', JSON.stringify(historicoEventos));
-        
         listaEvento = [];
         localStorage.setItem('listaEvento', "[]");
         document.getElementById('nomeDaFesta').value = "";
-        localStorage.removeItem('nomeFestaSalvo');
-        
         atualizarTabelaEvento();
         renderizarHistorico();
-        alert("Evento salvo no histórico!");
     }
 
     function renderizarHistorico() {
@@ -254,7 +242,6 @@
                 <div class="item-historico">
                     <div><strong>📅 ${ev.data} - ${ev.nome}</strong> (${ev.participantes.length} presentes)</div>
                     <div>
-                        <button onclick="alert('Lista:\\n' + historicoEventos.find(x=>x.id==${ev.id}).participantes.map(p=>p.nome).join('\\n'))" style="background:#6c757d; font-size:10px;">Ver</button>
                         <button onclick="excluirHistorico(${ev.id})" class="btn-excluir">Apagar</button>
                     </div>
                 </div>`;
@@ -262,27 +249,16 @@
     }
 
     function excluirHistorico(id) {
-        if(confirm("Apagar este registro do histórico?")) {
+        if(confirm("Apagar histórico?")) {
             historicoEventos = historicoEventos.filter(ev => ev.id !== id);
             localStorage.setItem('historicoEventos', JSON.stringify(historicoEventos));
             renderizarHistorico();
         }
     }
 
-    function exportarExcel() {
-        if(listaEvento.length === 0) return alert("Lista vazia!");
-        let csv = `Evento: ${document.getElementById('nomeDaFesta').value}\n\nNome;Cidade;Titulo;Zona;Secao\n`;
-        listaEvento.forEach(p => csv += `${p.nome};${p.cidade};${p.titulo};${p.zona};${p.secao}\n`);
-        const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "lista_presenca.csv";
-        a.click();
-    }
-
     function copiarLink() {
         navigator.clipboard.writeText(document.getElementById('linkGerado').innerText);
-        alert("Link copiado!");
+        alert("Link seguro copiado!");
     }
 
     function limparCampos() { document.querySelectorAll('.form-group input').forEach(i => i.value = ''); }
@@ -292,6 +268,5 @@
     atualizarTabelaEvento();
     renderizarHistorico();
 </script>
-
 </body>
 </html>
