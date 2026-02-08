@@ -2,32 +2,33 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Sistema de Gestão - Acesso Inteligente</title>
+    <title>Sistema de Gestão - Versão Final</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f0f2f5; color: #333; }
         .container { max-width: 1200px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2, h3 { color: #0056b3; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         
         /* TELA DE LOGIN */
-        #telaBloqueio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,50,0,0.95); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; text-align: center; flex-direction: column; }
-        .login-box { background: white; color: #333; padding: 30px; border-radius: 10px; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        #telaBloqueio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: white; padding: 30px; border-radius: 10px; width: 350px; text-align: center; }
         
-        /* ESTILOS GERAIS */
-        h2, h3 { color: #0056b3; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        /* FORMULÁRIOS */
         .form-group { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; }
         input, button, select { padding: 12px; border-radius: 6px; border: 1px solid #ddd; font-size: 15px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
         button { background-color: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; }
-        button:hover { background-color: #0056b3; }
         
-        /* TABELAS E RANKING */
+        /* TABELAS */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
         th { background: #0056b3; color: white; }
+        
+        /* STATUS */
         .status-ativo { background: #28a745; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
         .status-inativo { background: #dc3545; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
         
-        .secao-eventos { background: #fff3cd; padding: 20px; border-radius: 8px; margin-top: 40px; }
-        .area-admin, .area-logado { display: none; }
-        .alerta-convite { background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; border: 1px solid #c3e6cb; }
+        .secao-eventos { background: #fff3cd; padding: 20px; border-radius: 8px; margin-top: 40px; border: 1px solid #ffeeba; }
+        .area-restrita { display: none; } /* Só o Admin (Azevedo) vê */
+        .badge-lider { background: #6f42c1; color: white; padding: 3px 7px; border-radius: 4px; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -35,48 +36,37 @@
 <div id="telaBloqueio">
     <div class="login-box">
         <h3>Acesso ao Sistema</h3>
-        <p>Digite seu <strong>Título de Eleitor</strong> para acessar seu link e equipe.</p>
+        <p>Digite seu <strong>Título</strong> para entrar:</p>
         <input type="number" id="loginTitulo" placeholder="Número do Título">
-        <button onclick="verificarAcesso()">ENTRAR NO MEU PAINEL</button>
-        <hr>
-        <p style="font-size: 12px; color: #666;">Se você foi convidado por um link, o cadastro aparecerá automaticamente.</p>
+        <button onclick="verificarAcesso()">ACESSAR PAINEL</button>
+        <p style="font-size: 11px; color: #666; margin-top: 10px;">Novos indicados: usem o link recebido para cadastrar.</p>
     </div>
 </div>
 
 <div class="container">
     <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 id="saudacao">Sistema de Gestão Eleitoral</h2>
-        <button onclick="location.reload()" style="width: auto; background: #6c757d; padding: 5px 15px;">SAIR / VOLTAR</button>
+        <h2 id="saudacao">Gestão Eleitoral</h2>
+        <button onclick="location.reload()" style="width: auto; background: #6c757d; padding: 5px 15px;">SAIR</button>
     </div>
 
-    <div id="areaCadastro" style="display:none;">
-        <div class="alerta-convite">
-            📢 Você foi convidado por: <span id="nomeIndicador">...</span>. Faça seu cadastro abaixo para gerar seu próprio link!
-        </div>
-        <div class="form-group">
-            <h3>📝 Realizar Meu Cadastro</h3>
-            <input type="text" id="nome" placeholder="Nome Completo">
-            <input type="text" id="cidade" placeholder="Cidade">
-            <input type="number" id="titulo" placeholder="Título de Eleitor">
-            <input type="number" id="zona" placeholder="Zona">
-            <input type="number" id="secao" placeholder="Seção">
-            <button onclick="cadastrar()" style="background: #28a745;">CADASTRAR E GERAR MEU LINK</button>
-        </div>
+    <div id="areaCadastro" class="form-group" style="border: 2px solid #28a745; display: none;">
+        <h3 style="color: #28a745;">📝 Novo Cadastro</h3>
+        <p id="msgConvidado" style="font-weight: bold;"></p>
+        <input type="text" id="nome" placeholder="Nome Completo">
+        <input type="text" id="cidade" placeholder="Cidade">
+        <input type="number" id="titulo" placeholder="Título de Eleitor">
+        <button onclick="cadastrar()" style="background: #28a745;">CONFIRMAR CADASTRO E GERAR LINK</button>
     </div>
 
-    <div id="areaLogado" class="area-logado">
-        <div class="form-group" style="background: #e7f3ff; border: 1px solid #b2d7ff;">
-            <h3>🔗 Seu Link de Convite Seguro</h3>
-            <p>Compartilhe este link para montar sua equipe de 10 pessoas:</p>
-            <span id="meuLink" style="font-weight: bold; color: #0056b3; word-break: break-all;"></span>
-            <button onclick="copiarLink()" style="background: #28a745; margin-top: 15px;">COPIAR MEU LINK</button>
-        </div>
+    <div id="areaLink" class="form-group" style="background: #e7f3ff; display: none;">
+        <h3>🔗 Seu Link de Convite</h3>
+        <span id="meuLink" style="font-weight: bold; color: #0056b3; word-break: break-all;"></span>
+        <button onclick="copiarLink()" style="background: #28a745; margin-top: 10px; width: auto; padding: 5px 20px;">Copiar Link</button>
     </div>
 
-    <div id="sessaoAdmin" class="area-admin">
-        <hr>
-        <h3>📊 Ranking Geral e Equipes</h3>
-        <table id="tabelaDados">
+    <div id="areaAdmin" class="area-restrita">
+        <h3>📊 Ranking Geral de Equipes</h3>
+        <table id="tabelaGeral">
             <thead>
                 <tr><th>Status</th><th>Nome</th><th>Título</th><th>Indicados</th><th>Líder</th><th>Ação</th></tr>
             </thead>
@@ -84,154 +74,150 @@
         </table>
 
         <div class="secao-eventos">
-            <h3>🎉 Controle de Evento Atual</h3>
-            <input type="text" id="nomeDaFesta" placeholder="Nome do Evento (Ex: Reunião Gravataí)" value="Evento Atual">
+            <h3>🎉 Evento Atual (Lista de Presença)</h3>
+            <input type="text" id="nomeEvento" placeholder="Nome do Evento" value="Evento Atual">
             <table id="tabelaEvento">
                 <thead><tr><th>Nome</th><th>Cidade</th><th>Ação</th></tr></thead>
                 <tbody></tbody>
             </table>
-            <div style="display: flex; gap: 10px;">
-                <button onclick="fecharESalvarEvento()" style="background: #17a2b8; margin-top: 10px;">💾 SALVAR NO HISTÓRICO</button>
-                <button onclick="exportarExcel()" style="background: #1d6f42; margin-top: 10px;">📥 EXCEL</button>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button onclick="salvarEvento()" style="background: #17a2b8;">💾 SALVAR NO HISTÓRICO</button>
+                <button onclick="exportarExcel()" style="background: #1d6f42;">📥 EXPORTAR EXCEL</button>
             </div>
         </div>
 
-        <h3>📜 Histórico de Eventos</h3>
+        <h3>📜 Histórico</h3>
         <div id="listaHistorico"></div>
     </div>
 </div>
 
 <script>
-    // SEU TÍTULO PARA ACESSO TOTAL
     const TITULO_MESTRE = "074635610418"; 
-
     let bancoPessoas = JSON.parse(localStorage.getItem('bancoPessoas')) || [];
     let listaEvento = JSON.parse(localStorage.getItem('listaEvento')) || [];
-    let historicoEventos = JSON.parse(localStorage.getItem('historicoEventos')) || [];
+    let historico = JSON.parse(localStorage.getItem('historicoEventos')) || [];
 
     const urlParams = new URLSearchParams(window.location.search);
-    const refDoLink = urlParams.get('ref');
+    const ref = urlParams.get('ref');
 
-    // LÓGICA DE INICIALIZAÇÃO: SE TIVER REF, ABRE CADASTRO. SE NÃO, TELA DE LOGIN.
+    // VERIFICAÇÃO INICIAL: SE É LINK DE INDICADO, PULA O LOGIN
     window.onload = function() {
-        if (refDoLink) {
-            const indicador = bancoPessoas.find(p => criarSlug(p.nome) === refDoLink);
+        if (ref) {
+            const indicador = bancoPessoas.find(p => criarSlug(p.nome) === ref);
             if (indicador) {
                 document.getElementById('telaBloqueio').style.display = 'none';
                 document.getElementById('areaCadastro').style.display = 'block';
-                document.getElementById('nomeIndicador').innerText = indicador.nome;
+                document.getElementById('msgConvidado').innerText = "Você foi convidado por: " + indicador.nome;
             }
         }
     }
 
-    function criarSlug(nome) {
-        return nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
-    }
+    function criarSlug(n) { return n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ''); }
 
     function verificarAcesso() {
-        const input = document.getElementById('loginTitulo').value;
-        const pessoa = bancoPessoas.find(p => p.titulo === input);
+        const t = document.getElementById('loginTitulo').value;
+        const p = bancoPessoas.find(x => x.titulo === t);
 
-        if (input === TITULO_MESTRE || pessoa) {
+        if (t === TITULO_MESTRE || p) {
             document.getElementById('telaBloqueio').style.display = 'none';
-            document.getElementById('areaCadastro').style.display = 'none';
+            document.getElementById('areaLink').style.display = 'block';
             
-            if (input === TITULO_MESTRE) {
-                document.getElementById('sessaoAdmin').style.display = 'block';
-                document.getElementById('areaLogado').style.display = 'block';
-                document.getElementById('saudacao').innerText = "Painel Administrativo - Azevedo";
+            if (t === TITULO_MESTRE) {
+                document.getElementById('areaAdmin').style.display = 'block';
+                document.getElementById('saudacao').innerText = "Painel Master - Azevedo";
                 document.getElementById('meuLink').innerText = window.location.href.split('?')[0] + "?ref=azevedo";
                 atualizarTabelaGeral();
                 renderizarHistorico();
             } else {
-                document.getElementById('areaLogado').style.display = 'block';
-                document.getElementById('saudacao').innerText = "Olá, " + pessoa.nome;
-                document.getElementById('meuLink').innerText = window.location.href.split('?')[0] + "?ref=" + pessoa.slug;
+                document.getElementById('saudacao').innerText = "Olá, " + p.nome;
+                document.getElementById('meuLink').innerText = window.location.href.split('?')[0] + "?ref=" + p.slug;
             }
-        } else {
-            alert("Título não encontrado!");
-        }
+        } else { alert("Título não cadastrado!"); }
     }
 
     function cadastrar() {
         const nome = document.getElementById('nome').value.trim();
         const titulo = document.getElementById('titulo').value;
         const cidade = document.getElementById('cidade').value;
-        const zona = document.getElementById('zona').value;
-        const secao = document.getElementById('secao').value;
 
-        if (!nome || !titulo) return alert("Nome e Título são obrigatórios!");
-        if (bancoPessoas.some(p => p.titulo === titulo)) return alert("Este título já está cadastrado!");
+        if (!nome || !titulo) return alert("Preencha Nome e Título!");
+        if (bancoPessoas.some(x => x.titulo === titulo)) return alert("Já cadastrado!");
 
-        const novo = { 
-            nome, titulo, cidade, zona, secao,
-            slug: criarSlug(nome), 
-            indicadoPor: refDoLink || "direto" 
-        };
-
+        const novo = { nome, titulo, cidade, slug: criarSlug(nome), indicadoPor: ref || "direto" };
         bancoPessoas.push(novo);
         localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
         
-        alert("Cadastro realizado com sucesso! Use seu título para entrar no painel e ver seu link.");
-        location.search = ""; // Limpa o link de ref e volta para o login
+        alert("Cadastrado! Agora use seu título no Login para entrar.");
+        location.search = ""; 
     }
 
     function atualizarTabelaGeral() {
-        const tbody = document.querySelector('#tabelaDados tbody');
+        const tbody = document.querySelector('#tabelaGeral tbody');
         tbody.innerHTML = "";
         bancoPessoas.forEach(p => {
             const indicados = bancoPessoas.filter(m => m.indicadoPor === p.slug).length;
             const status = indicados >= 10 ? '<span class="status-ativo">ATIVO</span>' : '<span class="status-inativo">INATIVO</span>';
+            const lider = bancoPessoas.find(l => l.slug === p.indicadoPor);
             const linha = tbody.insertRow();
-            linha.innerHTML = `<td>${status}</td><td><b>${p.nome}</b></td><td>${p.titulo}</td><td>${indicados}/10</td><td>${p.indicadoPor}</td>
-            <td><button onclick="confirmarPresenca('${p.titulo}')" style="background:#28a745; font-size:10px; width:auto;">PRESENÇA</button>
-            <button onclick="excluirMembro('${p.titulo}')" style="background:#dc3545; font-size:10px; width:auto;">X</button></td>`;
+            linha.innerHTML = `<td>${status}</td><td><b>${p.nome}</b></td><td>${p.titulo}</td><td>${indicados}/10</td>
+            <td><span class="badge-lider">${lider ? lider.nome : 'Direto'}</span></td>
+            <td><button onclick="addEvento('${p.titulo}')" style="background:#28a745; font-size:10px; width:auto;">PRESENÇA</button>
+            <button onclick="excluir('${p.titulo}')" style="background:red; font-size:10px; width:auto; margin-left:5px;">X</button></td>`;
         });
     }
 
-    function confirmarPresenca(t) {
+    function addEvento(t) {
         const p = bancoPessoas.find(x => x.titulo === t);
-        if (!listaEvento.some(e => e.titulo === t)) {
+        if (p && !listaEvento.some(e => e.titulo === t)) {
             listaEvento.push(p);
             localStorage.setItem('listaEvento', JSON.stringify(listaEvento));
-            atualizarTabelaEvento();
+            renderEvento();
         }
     }
 
-    function atualizarTabelaEvento() {
+    function renderEvento() {
         const tbody = document.querySelector('#tabelaEvento tbody');
         tbody.innerHTML = "";
         listaEvento.forEach(p => {
-            tbody.innerHTML += `<tr><td>${p.nome}</td><td>${p.cidade}</td><td><button onclick="removerPresenca('${p.titulo}')" style="background:red; padding:2px;">Remover</button></td></tr>`;
+            tbody.innerHTML += `<tr><td>${p.nome}</td><td>${p.cidade}</td>
+            <td><button onclick="removerEv('${p.titulo}')" style="background:red; padding:2px;">Remover</button></td></tr>`;
         });
     }
 
-    function removerPresenca(t) {
+    function removerEv(t) {
         listaEvento = listaEvento.filter(e => e.titulo !== t);
         localStorage.setItem('listaEvento', JSON.stringify(listaEvento));
-        atualizarTabelaEvento();
+        renderEvento();
     }
 
-    function fecharESalvarEvento() {
-        const nomeF = document.getElementById('nomeDaFesta').value;
+    function salvarEvento() {
+        const n = document.getElementById('nomeEvento').value;
         if(listaEvento.length === 0) return alert("Lista vazia!");
-        historicoEventos.push({ nome: nomeF, data: new Date().toLocaleString(), total: listaEvento.length });
-        localStorage.setItem('historicoEventos', JSON.stringify(historicoEventos));
+        historico.push({ nome: n, data: new Date().toLocaleString(), total: listaEvento.length });
+        localStorage.setItem('historicoEventos', JSON.stringify(historico));
         listaEvento = [];
         localStorage.setItem('listaEvento', "[]");
-        alert("Evento salvo!");
+        renderEvento();
         renderizarHistorico();
-        atualizarTabelaEvento();
+        alert("Evento salvo!");
     }
 
     function renderizarHistorico() {
         const h = document.getElementById('listaHistorico');
         h.innerHTML = "";
-        historicoEventos.slice().reverse().forEach(ev => {
-            h.innerHTML += `<div style="border-left:4px solid #17a2b8; padding:10px; background:#f8f9fa; margin-top:5px;">
+        historico.slice().reverse().forEach(ev => {
+            h.innerHTML += `<div style="background:#f8f9fa; border-left:5px solid #007bff; padding:10px; margin-top:5px;">
                 <strong>${ev.data}</strong> - ${ev.nome} (${ev.total} presentes)
             </div>`;
         });
+    }
+
+    function excluir(t) {
+        if(confirm("Excluir?")) {
+            bancoPessoas = bancoPessoas.filter(p => p.titulo !== t);
+            localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
+            atualizarTabelaGeral();
+        }
     }
 
     function exportarExcel() {
@@ -240,22 +226,16 @@
         const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = "lista_evento.csv";
+        a.download = "lista.csv";
         a.click();
-    }
-
-    function excluirMembro(t) {
-        if(confirm("Deseja excluir este membro?")) {
-            bancoPessoas = bancoPessoas.filter(p => p.titulo !== t);
-            localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
-            atualizarTabelaGeral();
-        }
     }
 
     function copiarLink() {
         navigator.clipboard.writeText(document.getElementById('meuLink').innerText);
         alert("Link copiado!");
     }
+
+    renderEvento();
 </script>
 </body>
 </html>
