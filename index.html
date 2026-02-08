@@ -2,39 +2,56 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Sistema de Gestão - Segurança Ativada</title>
+    <title>Sistema de Gestão - Administrativo e Seguro</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f0f2f5; color: #333; }
         .container { max-width: 1200px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h2, h3 { color: #0056b3; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 30px; }
-        .alerta-indicacao { background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 20px; display: none; border: 1px solid #c3e6cb; }
-        .form-group { display: grid; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; }
+        .alerta-indicacao { background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; border: 1px solid #c3e6cb; font-weight: bold; }
+        
+        /* Formulários */
+        .form-group { display: grid; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
         .grid-campos { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; }
         input, button, select { padding: 12px; border-radius: 6px; border: 1px solid #ddd; font-size: 15px; }
+        
+        /* Botões */
         button { background-color: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
         button:hover { background-color: #0056b3; }
+        .btn-salvar { background-color: #17a2b8; width: 100%; margin-top: 10px; padding: 15px; }
+        .btn-excel { background-color: #1d6f42; }
+        
+        /* Link de Convite */
         .area-link { background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 10px 0; display: none; border: 1px solid #b2d7ff; }
-        .filtro-secao { background: #e9ecef; padding: 15px; border-radius: 8px; margin-top: 20px; display: flex; align-items: center; gap: 10px; }
+        
+        /* Tabelas */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; background: white; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
         th { background: #0056b3; color: white; }
+        
+        /* Status */
         .status-ativo { background-color: #28a745; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
         .status-inativo { background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-        .badge-lider { background: #6f42c1; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
-        .btn-confirmar { background-color: #28a745; font-size: 11px; padding: 5px 8px; margin-right: 5px; }
-        .btn-excluir { background-color: #dc3545; font-size: 11px; padding: 5px 8px; }
+        
+        /* Seções Coloridas */
         .secao-eventos { background: #fff3cd; padding: 20px; border-radius: 8px; border: 1px solid #ffeeba; margin-top: 40px; }
         .secao-historico { background: #d1ecf1; padding: 20px; border-radius: 8px; border: 1px solid #bee5eb; margin-top: 40px; }
-        .item-historico { background: white; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 5px solid #17a2b8; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Administração */
+        .admin-bar { background: #343a40; color: white; padding: 10px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🚀 Gestão de Equipe (Link por Nome)</h2>
+    <div class="admin-bar">
+        <span>⚙️ Painel do Administrador</span>
+        <button onclick="localStorage.clear(); location.reload();" style="background: #dc3545; font-size: 10px;">REINICIAR TODO O SISTEMA</button>
+    </div>
+
+    <h2>🚀 Gestão de Equipe (Link Seguro por Nome)</h2>
 
     <div id="alertaRef" class="alerta-indicacao">
-        📢 Você está entrando através do convite de: <strong id="nomeIndicador">...</strong>
+        📢 Convite de: <strong id="nomeIndicador">...</strong>
     </div>
     
     <div class="form-group">
@@ -49,14 +66,14 @@
     </div>
 
     <div id="areaLink" class="area-link">
-        <strong>🔗 Link de Convite Seguro:</strong> <br>
-        <span id="linkGerado" style="word-break: break-all; color: #0056b3; font-family: monospace;"></span>
+        <strong>🔗 Link para enviar ao novo membro:</strong> <br>
+        <span id="linkGerado" style="word-break: break-all; color: #0056b3; font-family: monospace; font-weight: bold;"></span>
         <button onclick="copiarLink()" style="padding: 5px; font-size: 11px; background: #28a745; margin-left: 10px;">Copiar Link</button>
     </div>
 
-    <div class="filtro-secao">
-        <strong>🔍 Filtrar por Líder:</strong>
-        <select id="selectLider" onchange="atualizarTabelaGeral()" style="flex-grow: 1;"></select>
+    <div style="margin-top: 20px; background: #eee; padding: 10px; border-radius: 8px;">
+        <strong>🔍 Filtrar Equipe de:</strong>
+        <select id="selectLider" onchange="atualizarTabelaGeral()" style="width: 80%;"></select>
     </div>
 
     <table id="tabelaDados">
@@ -66,7 +83,6 @@
                 <th>Nome</th>
                 <th>Cidade</th>
                 <th>Título</th>
-                <th>Zona/Seção</th>
                 <th>Indicados</th>
                 <th>Líder</th>
                 <th>Ações</th>
@@ -77,20 +93,22 @@
 
     <div class="secao-eventos">
         <h3>🎉 Evento Atual</h3>
-        <input type="text" id="nomeDaFesta" style="width: 98%; margin-bottom: 15px;" placeholder="Nome da Festa" oninput="localStorage.setItem('nomeFestaSalvo', this.value)">
-        <div style="font-weight: bold; margin-bottom: 10px;">Confirmados: <span id="numConfirmados">0</span></div>
+        <input type="text" id="nomeDaFesta" style="width: 97%; padding: 10px; margin-bottom: 10px; font-weight: bold;" placeholder="Nome do Evento (Ex: Aniversário Líder Azevedo)">
+        
+        <div style="font-weight: bold;">Pessoas na Lista: <span id="numConfirmados">0</span></div>
         <table id="tabelaEvento">
             <thead><tr><th>Nome</th><th>Cidade</th><th>Ação</th></tr></thead>
             <tbody></tbody>
         </table>
-        <div style="margin-top: 15px;">
-            <button onclick="fecharESalvarEvento()" style="background-color: #17a2b8;">💾 Salvar Histórico</button>
-            <button onclick="exportarExcel()" style="background-color: #1d6f42;">📥 Excel</button>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+            <button class="btn-salvar" onclick="fecharESalvarEvento()">💾 SALVAR NO HISTÓRICO</button>
+            <button class="btn-excel" onclick="exportarExcel()" style="margin-top: 10px;">📥 BAIXAR EXCEL</button>
         </div>
     </div>
 
     <div class="secao-historico">
-        <h3>📜 Histórico</h3>
+        <h3>📜 Histórico de Eventos</h3>
         <div id="listaHistorico"></div>
     </div>
 </div>
@@ -103,6 +121,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const refDoLink = urlParams.get('ref');
 
+    // Verifica se veio por link de alguém
     if (refDoLink) {
         const indicador = bancoPessoas.find(p => criarSlug(p.nome) === refDoLink);
         if (indicador) {
@@ -122,19 +141,13 @@
         const zona = document.getElementById('zona').value;
         const secao = document.getElementById('secao').value;
 
-        if (!nome || !titulo) return alert("Nome e Título são obrigatórios!");
+        if (!nome || !titulo) return alert("Preencha Nome e Título!");
         
         const slugNome = criarSlug(nome);
-        if (bancoPessoas.some(p => criarSlug(p.nome) === slugNome)) {
-            return alert("Este nome já possui um link ativo ou é muito similar a um existente!");
-        }
+        if (bancoPessoas.some(p => p.titulo === titulo)) return alert("Título já cadastrado!");
 
         const novoMembro = { 
-            nome, 
-            cidade, 
-            titulo, 
-            zona, 
-            secao, 
+            nome, cidade, titulo, zona, secao, 
             indicadoPor: refDoLink || "direto",
             slug: slugNome 
         };
@@ -151,18 +164,9 @@
         limparCampos();
     }
 
-    function excluirMembro(titulo) {
-        if(confirm("Excluir este membro?")) {
-            bancoPessoas = bancoPessoas.filter(p => p.titulo !== titulo);
-            localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
-            popularFiltroLideres();
-            atualizarTabelaGeral();
-        }
-    }
-
     function popularFiltroLideres() {
         const select = document.getElementById('selectLider');
-        select.innerHTML = '<option value="todos">-- Todos --</option><option value="direto">Sem Líder</option>';
+        select.innerHTML = '<option value="todos">-- Mostrar Todos --</option><option value="direto">Sem Líder (Diretos)</option>';
         const lideresUnicos = [...new Set(bancoPessoas.map(p => p.indicadoPor))].filter(r => r !== 'direto');
         lideresUnicos.forEach(slugLider => {
             const l = bancoPessoas.find(p => p.slug === slugLider);
@@ -187,19 +191,18 @@
                 <td><b>${p.nome}</b></td>
                 <td>${p.cidade}</td>
                 <td>${p.titulo}</td>
-                <td>${p.zona}/${p.secao}</td>
                 <td style="text-align:center"><b>${countIndicados}</b> / 10</td>
-                <td><span class="badge-lider">${lider ? lider.nome : 'Nenhum'}</span></td>
+                <td>${lider ? lider.nome : 'Direto'}</td>
                 <td>
-                    <button class="btn-confirmar" onclick="confirmarPresenca('${p.titulo}')">PRESENÇA</button>
-                    <button class="btn-excluir" onclick="excluirMembro('${p.titulo}')">X</button>
+                    <button onclick="confirmarPresenca('${p.titulo}')" style="background:#28a745; font-size:10px;">PRESENÇA</button>
+                    <button onclick="excluirMembro('${p.titulo}')" style="background:#dc3545; font-size:10px;">X</button>
                 </td>`;
         });
     }
 
     function confirmarPresenca(titulo) {
         const p = bancoPessoas.find(x => x.titulo === titulo);
-        if (listaEvento.some(e => e.titulo === p.titulo)) return;
+        if (!p || listaEvento.some(e => e.titulo === p.titulo)) return;
         listaEvento.push(p);
         localStorage.setItem('listaEvento', JSON.stringify(listaEvento));
         atualizarTabelaEvento();
@@ -218,20 +221,29 @@
         listaEvento.forEach(p => {
             const linha = tbody.insertRow();
             linha.innerHTML = `<td>${p.nome}</td><td>${p.cidade}</td>
-            <td><button class="btn-excluir" onclick="removerPresencaAtual('${p.titulo}')">Remover</button></td>`;
+            <td><button onclick="removerPresencaAtual('${p.titulo}')" style="background:#dc3545; padding:5px;">Remover</button></td>`;
         });
     }
 
     function fecharESalvarEvento() {
-        const nome = document.getElementById('nomeDaFesta').value;
-        if(!nome || listaEvento.length === 0) return alert("Dê um nome e adicione pessoas!");
-        historicoEventos.push({ id: Date.now(), nome: nome, data: new Date().toLocaleString(), participantes: [...listaEvento] });
+        const nomeFesta = document.getElementById('nomeDaFesta').value;
+        if(!nomeFesta || listaEvento.length === 0) return alert("Dê um nome ao evento e adicione pessoas!");
+        
+        historicoEventos.push({ 
+            id: Date.now(), 
+            nome: nomeFesta, 
+            data: new Date().toLocaleString(), 
+            participantes: [...listaEvento] 
+        });
+        
         localStorage.setItem('historicoEventos', JSON.stringify(historicoEventos));
         listaEvento = [];
         localStorage.setItem('listaEvento', "[]");
         document.getElementById('nomeDaFesta').value = "";
+        
         atualizarTabelaEvento();
         renderizarHistorico();
+        alert("Evento salvo com sucesso!");
     }
 
     function renderizarHistorico() {
@@ -239,26 +251,43 @@
         div.innerHTML = "";
         historicoEventos.slice().reverse().forEach(ev => {
             div.innerHTML += `
-                <div class="item-historico">
-                    <div><strong>📅 ${ev.data} - ${ev.nome}</strong> (${ev.participantes.length} presentes)</div>
-                    <div>
-                        <button onclick="excluirHistorico(${ev.id})" class="btn-excluir">Apagar</button>
-                    </div>
+                <div style="background:white; padding:10px; margin-top:5px; border-radius:5px; border-left:5px solid #17a2b8; display:flex; justify-content:space-between;">
+                    <span><strong>${ev.data}</strong> - ${ev.nome} (${ev.participantes.length} presentes)</span>
+                    <button onclick="excluirHistorico(${ev.id})" style="background:#dc3545; padding:5px; font-size:10px;">Apagar</button>
                 </div>`;
         });
     }
 
     function excluirHistorico(id) {
-        if(confirm("Apagar histórico?")) {
+        if(confirm("Apagar este registro?")) {
             historicoEventos = historicoEventos.filter(ev => ev.id !== id);
             localStorage.setItem('historicoEventos', JSON.stringify(historicoEventos));
             renderizarHistorico();
         }
     }
 
+    function excluirMembro(titulo) {
+        if(confirm("Excluir este membro?")) {
+            bancoPessoas = bancoPessoas.filter(p => p.titulo !== titulo);
+            localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
+            popularFiltroLideres();
+            atualizarTabelaGeral();
+        }
+    }
+
+    function exportarExcel() {
+        let csv = "Nome;Cidade;Titulo;Zona;Secao\n";
+        listaEvento.forEach(p => csv += `${p.nome};${p.cidade};${p.titulo};${p.zona};${p.secao}\n`);
+        const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "lista_evento.csv";
+        a.click();
+    }
+
     function copiarLink() {
         navigator.clipboard.writeText(document.getElementById('linkGerado').innerText);
-        alert("Link seguro copiado!");
+        alert("Link copiado!");
     }
 
     function limparCampos() { document.querySelectorAll('.form-group input').forEach(i => i.value = ''); }
@@ -268,5 +297,6 @@
     atualizarTabelaEvento();
     renderizarHistorico();
 </script>
+
 </body>
 </html>
