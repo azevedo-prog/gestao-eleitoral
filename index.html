@@ -2,301 +2,186 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Sistema de Gestão - Administrativo e Seguro</title>
+    <title>Sistema de Gestão - Segurança Máxima</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f0f2f5; color: #333; }
         .container { max-width: 1200px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2, h3 { color: #0056b3; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 30px; }
-        .alerta-indicacao { background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; border: 1px solid #c3e6cb; font-weight: bold; }
         
-        /* Formulários */
-        .form-group { display: grid; gap: 10px; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
-        .grid-campos { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; }
-        input, button, select { padding: 12px; border-radius: 6px; border: 1px solid #ddd; font-size: 15px; }
+        /* TELA DE LOGIN/RESTRIÇÃO */
+        #telaBloqueio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,50,0,0.95); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; text-align: center; flex-direction: column; }
+        .login-box { background: white; color: #333; padding: 30px; border-radius: 10px; width: 300px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         
-        /* Botões */
-        button { background-color: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; transition: 0.3s; }
+        /* ESTILOS GERAIS */
+        h2, h3 { color: #0056b3; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .form-group { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; }
+        input, button, select { padding: 12px; border-radius: 6px; border: 1px solid #ddd; font-size: 15px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; }
         button:hover { background-color: #0056b3; }
-        .btn-salvar { background-color: #17a2b8; width: 100%; margin-top: 10px; padding: 15px; }
-        .btn-excel { background-color: #1d6f42; }
         
-        /* Link de Convite */
-        .area-link { background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 10px 0; display: none; border: 1px solid #b2d7ff; }
-        
-        /* Tabelas */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; background: white; }
+        /* TABELAS E STATUS */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
         th { background: #0056b3; color: white; }
+        .status-ativo { background: #28a745; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; }
+        .status-inativo { background: #dc3545; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; }
         
-        /* Status */
-        .status-ativo { background-color: #28a745; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-        .status-inativo { background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-        
-        /* Seções Coloridas */
-        .secao-eventos { background: #fff3cd; padding: 20px; border-radius: 8px; border: 1px solid #ffeeba; margin-top: 40px; }
-        .secao-historico { background: #d1ecf1; padding: 20px; border-radius: 8px; border: 1px solid #bee5eb; margin-top: 40px; }
-        
-        /* Administração */
-        .admin-bar { background: #343a40; color: white; padding: 10px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        /* SEÇÕES ESPECÍFICAS */
+        .secao-eventos { background: #fff3cd; padding: 20px; border-radius: 8px; margin-top: 40px; }
+        .area-admin { display: none; } /* Escondido por padrão */
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="admin-bar">
-        <span>⚙️ Painel do Administrador</span>
-        <button onclick="localStorage.clear(); location.reload();" style="background: #dc3545; font-size: 10px;">REINICIAR TODO O SISTEMA</button>
+<div id="telaBloqueio">
+    <div class="login-box">
+        <h3>Acesso ao Sistema</h3>
+        <p>Digite seu <strong>Título de Eleitor</strong> para acessar seus dados e link.</p>
+        <input type="number" id="loginTitulo" placeholder="Número do Título">
+        <button onclick="verificarAcesso()">ENTRAR</button>
+        <p style="font-size: 10px; color: #666;">Acesso restrito para administradores e líderes cadastrados.</p>
+    </div>
+</div>
+
+<div class="container" id="conteudoPrincipal" style="display:none;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 id="saudacao">Bem-vindo</h2>
+        <button onclick="location.reload()" style="width: auto; background: #6c757d; padding: 5px 15px;">SAIR</button>
     </div>
 
-    <h2>🚀 Gestão de Equipe (Link Seguro por Nome)</h2>
-
-    <div id="alertaRef" class="alerta-indicacao">
-        📢 Convite de: <strong id="nomeIndicador">...</strong>
-    </div>
-    
-    <div class="form-group">
-        <input type="text" id="nome" placeholder="Nome Completo">
-        <input type="text" id="cidade" placeholder="Cidade">
-        <div class="grid-campos">
-            <input type="number" id="titulo" placeholder="Título de Eleitor">
-            <input type="number" id="zona" placeholder="Zona">
-            <input type="number" id="secao" placeholder="Seção">
-            <button onclick="cadastrar()">CADASTRAR E GERAR LINK</button>
-        </div>
+    <div class="form-group" style="background: #e7f3ff;">
+        <strong>🔗 Seu Link de Convite Seguro:</strong><br>
+        <span id="meuLink" style="font-weight: bold; color: #0056b3;"></span>
+        <button onclick="copiarLink()" style="background: #28a745; margin-top: 10px;">Copiar Meu Link</button>
     </div>
 
-    <div id="areaLink" class="area-link">
-        <strong>🔗 Link para enviar ao novo membro:</strong> <br>
-        <span id="linkGerado" style="word-break: break-all; color: #0056b3; font-family: monospace; font-weight: bold;"></span>
-        <button onclick="copiarLink()" style="padding: 5px; font-size: 11px; background: #28a745; margin-left: 10px;">Copiar Link</button>
-    </div>
-
-    <div style="margin-top: 20px; background: #eee; padding: 10px; border-radius: 8px;">
-        <strong>🔍 Filtrar Equipe de:</strong>
-        <select id="selectLider" onchange="atualizarTabelaGeral()" style="width: 80%;"></select>
-    </div>
-
-    <table id="tabelaDados">
-        <thead>
-            <tr>
-                <th>Status</th>
-                <th>Nome</th>
-                <th>Cidade</th>
-                <th>Título</th>
-                <th>Indicados</th>
-                <th>Líder</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <div class="secao-eventos">
-        <h3>🎉 Evento Atual</h3>
-        <input type="text" id="nomeDaFesta" style="width: 97%; padding: 10px; margin-bottom: 10px; font-weight: bold;" placeholder="Nome do Evento (Ex: Aniversário Líder Azevedo)">
+    <div id="sessaoAdmin" class="area-admin">
+        <h3>🛡️ Painel de Controle (Restrito)</h3>
         
-        <div style="font-weight: bold;">Pessoas na Lista: <span id="numConfirmados">0</span></div>
-        <table id="tabelaEvento">
-            <thead><tr><th>Nome</th><th>Cidade</th><th>Ação</th></tr></thead>
+        <div class="form-group">
+            <p><strong>Cadastrar Novo Membro/Líder:</strong></p>
+            <input type="text" id="nome" placeholder="Nome Completo">
+            <input type="text" id="cidade" placeholder="Cidade">
+            <input type="number" id="titulo" placeholder="Título de Eleitor">
+            <button onclick="cadastrar()">CADASTRAR LÍDER</button>
+        </div>
+
+        <h3>📊 Ranking de Equipe</h3>
+        <table id="tabelaDados">
+            <thead>
+                <tr><th>Status</th><th>Nome</th><th>Título</th><th>Indicados</th><th>Líder</th><th>Ação</th></tr>
+            </thead>
             <tbody></tbody>
         </table>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
-            <button class="btn-salvar" onclick="fecharESalvarEvento()">💾 SALVAR NO HISTÓRICO</button>
-            <button class="btn-excel" onclick="exportarExcel()" style="margin-top: 10px;">📥 BAIXAR EXCEL</button>
-        </div>
-    </div>
 
-    <div class="secao-historico">
-        <h3>📜 Histórico de Eventos</h3>
-        <div id="listaHistorico"></div>
+        <div class="secao-eventos">
+            <h3>🎉 Gestão de Eventos</h3>
+            <input type="text" id="nomeDaFesta" placeholder="Nome do Evento">
+            <table id="tabelaEvento">
+                <thead><tr><th>Nome</th><th>Cidade</th><th>Ação</th></tr></thead>
+                <tbody></tbody>
+            </table>
+            <button onclick="fecharESalvarEvento()" style="background: #17a2b8; margin-top: 10px;">💾 SALVAR NO HISTÓRICO</button>
+        </div>
     </div>
 </div>
 
 <script>
+    // IMPORTANTE: Defina aqui o seu título para ter acesso total
+    const TITULO_MESTRE = "074635610418"; //
+
     let bancoPessoas = JSON.parse(localStorage.getItem('bancoPessoas')) || [];
     let listaEvento = JSON.parse(localStorage.getItem('listaEvento')) || [];
     let historicoEventos = JSON.parse(localStorage.getItem('historicoEventos')) || [];
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const refDoLink = urlParams.get('ref');
-
-    // Verifica se veio por link de alguém
-    if (refDoLink) {
-        const indicador = bancoPessoas.find(p => criarSlug(p.nome) === refDoLink);
-        if (indicador) {
-            document.getElementById('alertaRef').style.display = 'block';
-            document.getElementById('nomeIndicador').innerText = indicador.nome;
-        }
-    }
 
     function criarSlug(nome) {
         return nome.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '');
     }
 
-    function cadastrar() {
-        const nome = document.getElementById('nome').value.trim();
-        const cidade = document.getElementById('cidade').value;
-        const titulo = document.getElementById('titulo').value;
-        const zona = document.getElementById('zona').value;
-        const secao = document.getElementById('secao').value;
+    function verificarAcesso() {
+        const input = document.getElementById('loginTitulo').value;
+        const pessoa = bancoPessoas.find(p => p.titulo === input);
 
-        if (!nome || !titulo) return alert("Preencha Nome e Título!");
-        
-        const slugNome = criarSlug(nome);
-        if (bancoPessoas.some(p => p.titulo === titulo)) return alert("Título já cadastrado!");
-
-        const novoMembro = { 
-            nome, cidade, titulo, zona, secao, 
-            indicadoPor: refDoLink || "direto",
-            slug: slugNome 
-        };
-
-        bancoPessoas.push(novoMembro);
-        localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
-
-        const urlBase = window.location.href.split('?')[0];
-        document.getElementById('linkGerado').innerText = `${urlBase}?ref=${slugNome}`;
-        document.getElementById('areaLink').style.display = 'block';
-
-        popularFiltroLideres();
-        atualizarTabelaGeral();
-        limparCampos();
+        if (input === TITULO_MESTRE || pessoa) {
+            document.getElementById('telaBloqueio').style.display = 'none';
+            document.getElementById('conteudoPrincipal').style.display = 'block';
+            
+            // Se for o Mestre (Você), libera tudo
+            if (input === TITULO_MESTRE) {
+                document.getElementById('sessaoAdmin').style.display = 'block';
+                document.getElementById('saudacao').innerText = "Olá, Administrador Azevedo";
+                document.getElementById('meuLink').innerText = window.location.href.split('?')[0] + "?ref=azevedo";
+            } else {
+                // Se for um indicado, só vê o próprio link
+                document.getElementById('saudacao').innerText = "Olá, " + pessoa.nome;
+                document.getElementById('meuLink').innerText = window.location.href.split('?')[0] + "?ref=" + pessoa.slug;
+            }
+            atualizarTabelaGeral();
+        } else {
+            alert("Título não encontrado. Peça para seu líder cadastrar você!");
+        }
     }
 
-    function popularFiltroLideres() {
-        const select = document.getElementById('selectLider');
-        select.innerHTML = '<option value="todos">-- Mostrar Todos --</option><option value="direto">Sem Líder (Diretos)</option>';
-        const lideresUnicos = [...new Set(bancoPessoas.map(p => p.indicadoPor))].filter(r => r !== 'direto');
-        lideresUnicos.forEach(slugLider => {
-            const l = bancoPessoas.find(p => p.slug === slugLider);
-            if(l) select.innerHTML += `<option value="${slugLider}">Equipe de: ${l.nome}</option>`;
-        });
+    function cadastrar() {
+        const nome = document.getElementById('nome').value.trim();
+        const titulo = document.getElementById('titulo').value;
+        const cidade = document.getElementById('cidade').value;
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const ref = urlParams.get('ref') || "direto";
+
+        if (!nome || !titulo) return alert("Preencha os campos!");
+
+        const novo = { nome, titulo, cidade, slug: criarSlug(nome), indicadoPor: ref };
+        bancoPessoas.push(novo);
+        localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
+        alert("Cadastrado com sucesso!");
+        atualizarTabelaGeral();
     }
 
     function atualizarTabelaGeral() {
         const tbody = document.querySelector('#tabelaDados tbody');
-        const filtro = document.getElementById('selectLider').value;
         tbody.innerHTML = "";
-        let lista = (filtro === 'todos') ? bancoPessoas : bancoPessoas.filter(p => p.indicadoPor === filtro);
-
-        lista.forEach(p => {
-            const countIndicados = bancoPessoas.filter(m => m.indicadoPor === p.slug).length;
-            const statusHtml = countIndicados >= 10 ? '<span class="status-ativo">ATIVO</span>' : '<span class="status-inativo">INATIVO</span>';
-            const lider = bancoPessoas.find(l => l.slug === p.indicadoPor);
-
+        bancoPessoas.forEach(p => {
+            const indicados = bancoPessoas.filter(m => m.indicadoPor === p.slug).length;
+            const status = indicados >= 10 ? '<span class="status-ativo">ATIVO</span>' : '<span class="status-inativo">INATIVO</span>';
             const linha = tbody.insertRow();
-            linha.innerHTML = `
-                <td>${statusHtml}</td>
-                <td><b>${p.nome}</b></td>
-                <td>${p.cidade}</td>
-                <td>${p.titulo}</td>
-                <td style="text-align:center"><b>${countIndicados}</b> / 10</td>
-                <td>${lider ? lider.nome : 'Direto'}</td>
-                <td>
-                    <button onclick="confirmarPresenca('${p.titulo}')" style="background:#28a745; font-size:10px;">PRESENÇA</button>
-                    <button onclick="excluirMembro('${p.titulo}')" style="background:#dc3545; font-size:10px;">X</button>
-                </td>`;
+            linha.innerHTML = `<td>${status}</td><td>${p.nome}</td><td>${p.titulo}</td><td>${indicados}/10</td><td>${p.indicadoPor}</td>
+            <td><button onclick="confirmarPresenca('${p.titulo}')" style="background:#28a745; font-size:10px; width:auto;">PRESENÇA</button></td>`;
         });
     }
 
-    function confirmarPresenca(titulo) {
-        const p = bancoPessoas.find(x => x.titulo === titulo);
-        if (!p || listaEvento.some(e => e.titulo === p.titulo)) return;
-        listaEvento.push(p);
-        localStorage.setItem('listaEvento', JSON.stringify(listaEvento));
-        atualizarTabelaEvento();
-    }
-
-    function removerPresencaAtual(titulo) {
-        listaEvento = listaEvento.filter(e => e.titulo !== titulo);
-        localStorage.setItem('listaEvento', JSON.stringify(listaEvento));
-        atualizarTabelaEvento();
+    function confirmarPresenca(t) {
+        const p = bancoPessoas.find(x => x.titulo === t);
+        if (!listaEvento.some(e => e.titulo === t)) {
+            listaEvento.push(p);
+            localStorage.setItem('listaEvento', JSON.stringify(listaEvento));
+            atualizarTabelaEvento();
+        }
     }
 
     function atualizarTabelaEvento() {
         const tbody = document.querySelector('#tabelaEvento tbody');
         tbody.innerHTML = "";
-        document.getElementById('numConfirmados').innerText = listaEvento.length;
         listaEvento.forEach(p => {
-            const linha = tbody.insertRow();
-            linha.innerHTML = `<td>${p.nome}</td><td>${p.cidade}</td>
-            <td><button onclick="removerPresencaAtual('${p.titulo}')" style="background:#dc3545; padding:5px;">Remover</button></td>`;
+            tbody.innerHTML += `<tr><td>${p.nome}</td><td>${p.cidade}</td><td>OK</td></tr>`;
         });
-    }
-
-    function fecharESalvarEvento() {
-        const nomeFesta = document.getElementById('nomeDaFesta').value;
-        if(!nomeFesta || listaEvento.length === 0) return alert("Dê um nome ao evento e adicione pessoas!");
-        
-        historicoEventos.push({ 
-            id: Date.now(), 
-            nome: nomeFesta, 
-            data: new Date().toLocaleString(), 
-            participantes: [...listaEvento] 
-        });
-        
-        localStorage.setItem('historicoEventos', JSON.stringify(historicoEventos));
-        listaEvento = [];
-        localStorage.setItem('listaEvento', "[]");
-        document.getElementById('nomeDaFesta').value = "";
-        
-        atualizarTabelaEvento();
-        renderizarHistorico();
-        alert("Evento salvo com sucesso!");
-    }
-
-    function renderizarHistorico() {
-        const div = document.getElementById('listaHistorico');
-        div.innerHTML = "";
-        historicoEventos.slice().reverse().forEach(ev => {
-            div.innerHTML += `
-                <div style="background:white; padding:10px; margin-top:5px; border-radius:5px; border-left:5px solid #17a2b8; display:flex; justify-content:space-between;">
-                    <span><strong>${ev.data}</strong> - ${ev.nome} (${ev.participantes.length} presentes)</span>
-                    <button onclick="excluirHistorico(${ev.id})" style="background:#dc3545; padding:5px; font-size:10px;">Apagar</button>
-                </div>`;
-        });
-    }
-
-    function excluirHistorico(id) {
-        if(confirm("Apagar este registro?")) {
-            historicoEventos = historicoEventos.filter(ev => ev.id !== id);
-            localStorage.setItem('historicoEventos', JSON.stringify(historicoEventos));
-            renderizarHistorico();
-        }
-    }
-
-    function excluirMembro(titulo) {
-        if(confirm("Excluir este membro?")) {
-            bancoPessoas = bancoPessoas.filter(p => p.titulo !== titulo);
-            localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
-            popularFiltroLideres();
-            atualizarTabelaGeral();
-        }
-    }
-
-    function exportarExcel() {
-        let csv = "Nome;Cidade;Titulo;Zona;Secao\n";
-        listaEvento.forEach(p => csv += `${p.nome};${p.cidade};${p.titulo};${p.zona};${p.secao}\n`);
-        const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "lista_evento.csv";
-        a.click();
     }
 
     function copiarLink() {
-        navigator.clipboard.writeText(document.getElementById('linkGerado').innerText);
+        navigator.clipboard.writeText(document.getElementById('meuLink').innerText);
         alert("Link copiado!");
     }
 
-    function limparCampos() { document.querySelectorAll('.form-group input').forEach(i => i.value = ''); }
-
-    popularFiltroLideres();
-    atualizarTabelaGeral();
-    atualizarTabelaEvento();
-    renderizarHistorico();
+    function fecharESalvarEvento() {
+        const nome = document.getElementById('nomeDaFesta').value;
+        if(!nome || listaEvento.length === 0) return alert("Dados insuficientes!");
+        historicoEventos.push({ nome, data: new Date().toLocaleString(), participantes: [...listaEvento] });
+        localStorage.setItem('historicoEventos', JSON.stringify(historicoEventos));
+        listaEvento = [];
+        localStorage.setItem('listaEvento', "[]");
+        alert("Histórico Salvo!");
+        location.reload();
+    }
 </script>
-
 </body>
 </html>
