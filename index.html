@@ -1,102 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão Eleitoral - Azevedo</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        :root { --primary: #004085; --success: #28a745; --danger: #dc3545; }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        #telaBloqueio { position: fixed; inset: 0; background: #fff; z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .login-box { text-align: center; padding: 30px; border: 1px solid #ddd; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: var(--primary); color: white; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; color: white; font-weight: bold; font-size: 12px; }
+        .secao-evento { background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .area-admin { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="telaBloqueio">
+    <div class="login-box">
+        <h2>Acesso ao Sistema</h2>
+        <input type="number" id="loginTitulo" placeholder="Digite seu Título">
+        <button onclick="verificarAcesso()" style="background:var(--primary); color:white; padding:10px; border:none; cursor:pointer;">ACESSAR</button>
+    </div>
+</div>
+
+<div class="container">
+    <h1 id="boasVindas">Gestão Eleitoral 2026</h1>
+
+    <div style="background:#eee; padding:15px; border-radius:8px; display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px;">
+        <input type="text" id="regNome" placeholder="Nome">
+        <input type="text" id="regCidade" placeholder="Cidade">
+        <input type="number" id="regTitulo" placeholder="Título">
+        <input type="number" id="regZona" placeholder="Zona">
+        <input type="number" id="regSecao" placeholder="Seção">
+        <button onclick="cadastrar()" style="background:var(--success); color:white; border:none; cursor:pointer;">SALVAR</button>
+    </div>
+
+    <div id="painelAdmin" class="area-admin">
+        <h3>Lista Geral de Controle</h3>
+        <table id="tabelaMaster">
+            <thead>
+                <tr>
+                    <th>Status</th><th>Nome</th><th>Cidade</th><th>Título</th><th>Zona/Seção</th><th>Indicados</th><th>Líder</th><th>Ações</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div class="secao-evento">
+            <h4>📅 Evento Atual: Aniversário do Líder Azevedo 12/06/2026</h4>
+            <p>Confirmados: <span id="totalConfirmados">0</span></p>
+            <table>
+                <thead>
+                    <tr><th>Nome</th><th>Cidade</th><th>Ação</th></tr>
+                </thead>
+                <tbody id="listaPresencaConfirmados"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Suas chaves de configuração do Firebase aqui...
+    // 2. ATENÇÃO: COLOQUE SEUS DADOS AQUI ABAIXO
     const firebaseConfig = {
-        // ... cole suas chaves aqui ...
+        apiKey: "COLE_AQUI",
+        authDomain: "COLE_AQUI",
+        databaseURL: "COLE_AQUI",
+        projectId: "COLE_AQUI",
+        storageBucket: "COLE_AQUI",
+        messagingSenderId: "COLE_AQUI",
+        appId: "COLE_AQUI"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const MEU_TITULO = "074635610418";
 
-    // ESCUTA A NUVEM EM TEMPO REAL
-    function ouvirNuvem() {
-        // Atualiza Lista de Eleitores e Rankings
-        db.ref('eleitores').on('value', s => {
-            const lista = s.val() ? Object.entries(s.val()).map(item => ({id: item[0], ...item[1]})) : [];
-            renderTabela(lista);
-            renderRankings(lista);
-        });
-
-        // Atualiza Lista de Presença do Evento Atual
-        db.ref('presencas').on('value', s => {
-            const presencas = s.val() ? Object.values(s.val()) : [];
-            renderListaPresenca(presencas);
-        });
-    }
-
-    // RENDERIZA A TABELA PRINCIPAL
-    function renderTabela(dados) {
-        const tbody = document.querySelector("#tabelaMaster tbody");
-        tbody.innerHTML = "";
-        
-        dados.forEach(p => {
-            // Conta quantos indicados esse líder possui
-            const indicados = dados.filter(x => x.lider === p.slug).length;
-            const meta = 10;
-            const statusColor = indicados >= meta ? 'var(--success)' : 'var(--danger)';
-            const statusTexto = indicados >= meta ? 'ATIVO' : 'INATIVO';
-
-            tbody.innerHTML += `
-                <tr>
-                    <td><span class="status-badge" style="background:${statusColor}">${statusTexto}</span></td>
-                    <td><b>${p.nome}</b></td>
-                    <td>${p.cidade}</td>
-                    <td>${p.titulo}</td>
-                    <td>${p.zona}/${p.secao}</td>
-                    <td>${indicados} / ${meta}</td>
-                    <td>${p.lider}</td>
-                    <td>
-                        <button onclick="registrarPresenca('${p.nome}', '${p.cidade}')" class="btn-presenca" style="background:var(--success); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">PRESENÇA</button>
-                        <button onclick="excluir('${p.id}')" style="background:var(--danger); color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">X</button>
-                    </td>
-                </tr>`;
-        });
-    }
-
-    // FUNÇÃO PARA O BOTÃO VERDE "PRESENÇA"
-    function registrarPresenca(nome, cidade) {
-        const eventoAtual = "Aniversário do Líder Azevedo 12/06/2026"; // Pega o nome do evento
-        
-        db.ref('presencas').push({
-            nome: nome,
-            cidade: cidade,
-            evento: eventoAtual,
-            dataHora: new Date().toLocaleString()
-        });
-        alert("Presença confirmada para: " + nome);
-    }
-
-    // ATUALIZA A MINI-TABELA DE CONFIRMADOS ABAIXO DO EVENTO
-    function renderListaPresenca(presencas) {
-        const area = document.querySelector("#listaPresencaConfirmados"); // Certifique-se de ter esse ID no seu HTML
-        if(!area) return;
-        
-        document.getElementById('totalConfirmados').innerText = presencas.length;
-        area.innerHTML = presencas.map(p => `
-            <tr>
-                <td>${p.nome}</td>
-                <td>${p.cidade}</td>
-                <td>Confirmado ✅</td>
-            </tr>
-        `).join('');
-    }
-
-    // EXCLUIR REGISTRO
-    function excluir(id) {
-        if(confirm("Deseja realmente excluir este eleitor?")) {
-            db.ref('eleitores').child(id).remove();
-        }
-    }
-
-    // LOGIN E INICIALIZAÇÃO
     function verificarAcesso() {
         const t = document.getElementById('loginTitulo').value;
         if(t === MEU_TITULO) {
             document.getElementById('telaBloqueio').style.display = 'none';
             document.getElementById('painelAdmin').style.display = 'block';
             ouvirNuvem();
-        } else {
-            // Lógica para líderes verem apenas seus links...
-        }
+        } else { alert("Acesso negado."); }
+    }
+
+    function cadastrar() {
+        const novo = {
+            nome: document.getElementById('regNome').value,
+            cidade: document.getElementById('regCidade').value,
+            titulo: document.getElementById('regTitulo').value,
+            zona: document.getElementById('regZona').value,
+            secao: document.getElementById('regSecao').value,
+            lider: "Direto", // Depois podemos automatizar via link
+            slug: document.getElementById('regNome').value.toLowerCase().replace(/\s/g, '')
+        };
+        db.ref('eleitores').push(novo);
+        alert("Cadastrado!");
+    }
+
+    function registrarPresenca(nome, cidade) {
+        db.ref('presencas').push({ nome, cidade });
+        alert("Presença confirmada!");
+    }
+
+    function ouvirNuvem() {
+        db.ref('eleitores').on('value', s => {
+            const lista = s.val() ? Object.entries(s.val()).map(i => ({id: i[0], ...i[1]})) : [];
+            const tbody = document.querySelector("#tabelaMaster tbody");
+            tbody.innerHTML = "";
+            lista.forEach(p => {
+                const indicados = lista.filter(x => x.lider === p.slug).length;
+                const statusColor = indicados >= 10 ? 'var(--success)' : 'var(--danger)';
+                tbody.innerHTML += `<tr>
+                    <td><span class="status-badge" style="background:${statusColor}">${indicados >= 10 ? 'ATIVO' : 'INATIVO'}</span></td>
+                    <td>${p.nome}</td><td>${p.cidade}</td><td>${p.titulo}</td><td>${p.zona}/${p.secao}</td>
+                    <td>${indicados}/10</td><td>${p.lider}</td>
+                    <td><button onclick="registrarPresenca('${p.nome}', '${p.cidade}')" style="background:var(--success); color:white; border:none; padding:5px;">PRESENÇA</button></td>
+                </tr>`;
+            });
+        });
+
+        db.ref('presencas').on('value', s => {
+            const lista = s.val() ? Object.values(s.val()) : [];
+            document.getElementById('totalConfirmados').innerText = lista.length;
+            document.getElementById('listaPresencaConfirmados').innerHTML = lista.map(p => 
+                `<tr><td>${p.nome}</td><td>${p.cidade}</td><td>✅</td></tr>`
+            ).join('');
+        });
     }
 </script>
+</body>
+</html>
