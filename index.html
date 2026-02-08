@@ -2,240 +2,234 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Sistema de Gestão - Versão Final</title>
+    <title>Gestão Estratégica Eleitoral</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f0f2f5; color: #333; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2, h3 { color: #0056b3; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        :root { --primary: #004085; --success: #28a745; --warning: #ffc107; --danger: #dc3545; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 1300px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
         
-        /* TELA DE LOGIN */
-        #telaBloqueio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: white; padding: 30px; border-radius: 10px; width: 350px; text-align: center; }
+        /* LOGIN E ACESSO */
+        #telaBloqueio { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: white; padding: 40px; border-radius: 12px; width: 350px; text-align: center; }
         
-        /* FORMULÁRIOS */
-        .form-group { background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 20px; }
-        input, button, select { padding: 12px; border-radius: 6px; border: 1px solid #ddd; font-size: 15px; width: 100%; margin-bottom: 10px; box-sizing: border-box; }
-        button { background-color: #007bff; color: white; font-weight: bold; cursor: pointer; border: none; }
+        /* CABEÇALHO E RANKINGS */
+        .grid-rankings { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .card-rank { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card-rank h3 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #eee; }
+
+        /* FORMULÁRIOS E BUSCA */
+        .secao { background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef; margin-bottom: 20px; }
+        .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+        input, select, button { padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 14px; width: 100%; box-sizing: border-box; }
+        button { cursor: pointer; font-weight: bold; background: var(--primary); color: white; border: none; }
         
+        /* LUPA DE PESQUISA */
+        .busca-container { background: #e9ecef; padding: 15px; border-radius: 8px; display: flex; gap: 10px; align-items: center; }
+        .busca-container input { background: white; }
+
         /* TABELAS */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
-        th { background: #0056b3; color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; }
+        th { background: var(--primary); color: white; }
+        .status { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; }
         
-        /* STATUS */
-        .status-ativo { background: #28a745; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-        .status-inativo { background: #dc3545; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-        
-        .secao-eventos { background: #fff3cd; padding: 20px; border-radius: 8px; margin-top: 40px; border: 1px solid #ffeeba; }
-        .area-restrita { display: none; } /* Só o Admin (Azevedo) vê */
-        .badge-lider { background: #6f42c1; color: white; padding: 3px 7px; border-radius: 4px; font-size: 11px; }
+        .area-admin { display: none; }
     </style>
 </head>
 <body>
 
 <div id="telaBloqueio">
     <div class="login-box">
-        <h3>Acesso ao Sistema</h3>
-        <p>Digite seu <strong>Título</strong> para entrar:</p>
-        <input type="number" id="loginTitulo" placeholder="Número do Título">
-        <button onclick="verificarAcesso()">ACESSAR PAINEL</button>
-        <p style="font-size: 11px; color: #666; margin-top: 10px;">Novos indicados: usem o link recebido para cadastrar.</p>
+        <h2>Acesso Restrito</h2>
+        <input type="number" id="loginTitulo" placeholder="Digite seu Título">
+        <button onclick="verificarAcesso()">ENTRAR NO PAINEL</button>
+        <p style="font-size: 12px; color: #666; margin-top: 15px;">Se você recebeu um link de convite, o cadastro abrirá automaticamente.</p>
     </div>
 </div>
 
 <div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 id="saudacao">Gestão Eleitoral</h2>
-        <button onclick="location.reload()" style="width: auto; background: #6c757d; padding: 5px 15px;">SAIR</button>
+    <div style="display:flex; justify-content: space-between; align-items: center;">
+        <h1 id="userGreeting">Sistema de Gestão</h1>
+        <button onclick="location.reload()" style="width:auto; background:var(--danger)">SAIR</button>
     </div>
 
-    <div id="areaCadastro" class="form-group" style="border: 2px solid #28a745; display: none;">
-        <h3 style="color: #28a745;">📝 Novo Cadastro</h3>
-        <p id="msgConvidado" style="font-weight: bold;"></p>
-        <input type="text" id="nome" placeholder="Nome Completo">
-        <input type="text" id="cidade" placeholder="Cidade">
-        <input type="number" id="titulo" placeholder="Título de Eleitor">
-        <button onclick="cadastrar()" style="background: #28a745;">CONFIRMAR CADASTRO E GERAR LINK</button>
+    <div id="secaoCadastro" class="secao">
+        <h3>📝 Novo Cadastro</h3>
+        <div class="grid-inputs">
+            <input type="text" id="regNome" placeholder="Nome Completo">
+            <input type="text" id="regCidade" placeholder="Cidade">
+            <input type="number" id="regTitulo" placeholder="Nº Título">
+            <input type="number" id="regZona" placeholder="Zona">
+            <input type="number" id="regSecao" placeholder="Seção">
+            <button onclick="realizarCadastro()" style="background:var(--success)">CADASTRAR E GERAR LINK</button>
+        </div>
+        <div id="boxLink" style="display:none; margin-top:15px; padding:10px; background:#d4edda; border-radius:5px;">
+            <strong>Seu Link de Convite:</strong> <span id="txtLink"></span>
+        </div>
     </div>
 
-    <div id="areaLink" class="form-group" style="background: #e7f3ff; display: none;">
-        <h3>🔗 Seu Link de Convite</h3>
-        <span id="meuLink" style="font-weight: bold; color: #0056b3; word-break: break-all;"></span>
-        <button onclick="copiarLink()" style="background: #28a745; margin-top: 10px; width: auto; padding: 5px 20px;">Copiar Link</button>
-    </div>
+    <div id="conteudoAdmin" class="area-admin">
+        <div class="grid-rankings">
+            <div class="card-rank">
+                <h3>🏆 TOP 5 - Ano Atual (2026)</h3>
+                <div id="rankAno"></div>
+            </div>
+            <div class="card-rank">
+                <h3>🌎 TOP 5 - Histórico Geral</h3>
+                <div id="rankGeral"></div>
+            </div>
+        </div>
 
-    <div id="areaAdmin" class="area-restrita">
-        <h3>📊 Ranking Geral de Equipes</h3>
-        <table id="tabelaGeral">
+        <div class="secao">
+            <h3>🔍 Lupa de Pesquisa (Filtros Avançados)</h3>
+            <div class="busca-container">
+                <span>🔎</span>
+                <input type="text" id="filtroBusca" onkeyup="filtrarTabela()" placeholder="Pesquise por Nome, Cidade, Zona ou Seção...">
+            </div>
+        </div>
+
+        <h3>📋 Lista Geral de Cadastrados</h3>
+        <table id="tabelaMaster">
             <thead>
-                <tr><th>Status</th><th>Nome</th><th>Título</th><th>Indicados</th><th>Líder</th><th>Ação</th></tr>
+                <tr>
+                    <th>Status</th>
+                    <th>Nome</th>
+                    <th>Cidade</th>
+                    <th>Título</th>
+                    <th>Zona/Seção</th>
+                    <th>Indicados</th>
+                    <th>Líder</th>
+                    <th>Ação</th>
+                </tr>
             </thead>
             <tbody></tbody>
         </table>
 
-        <div class="secao-eventos">
-            <h3>🎉 Evento Atual (Lista de Presença)</h3>
-            <input type="text" id="nomeEvento" placeholder="Nome do Evento" value="Evento Atual">
-            <table id="tabelaEvento">
-                <thead><tr><th>Nome</th><th>Cidade</th><th>Ação</th></tr></thead>
-                <tbody></tbody>
-            </table>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button onclick="salvarEvento()" style="background: #17a2b8;">💾 SALVAR NO HISTÓRICO</button>
-                <button onclick="exportarExcel()" style="background: #1d6f42;">📥 EXPORTAR EXCEL</button>
+        <div class="secao" style="margin-top:40px; background:#fff3cd;">
+            <h3>📅 Gestão de Eventos Futuros</h3>
+            <div class="grid-inputs">
+                <input type="text" id="evNome" placeholder="Nome do Evento">
+                <input type="date" id="evData">
+                <button onclick="salvarEvento()" style="background:var(--primary)">AGENDAR EVENTO</button>
             </div>
+            <div id="listaEventos" style="margin-top:15px;"></div>
         </div>
-
-        <h3>📜 Histórico</h3>
-        <div id="listaHistorico"></div>
     </div>
 </div>
 
 <script>
-    const TITULO_MESTRE = "074635610418"; 
-    let bancoPessoas = JSON.parse(localStorage.getItem('bancoPessoas')) || [];
-    let listaEvento = JSON.parse(localStorage.getItem('listaEvento')) || [];
-    let historico = JSON.parse(localStorage.getItem('historicoEventos')) || [];
+    const MEU_TITULO = "074635610418";
+    let db = JSON.parse(localStorage.getItem('eleitoral_db')) || [];
+    let eventos = JSON.parse(localStorage.getItem('eleitoral_ev')) || [];
 
     const urlParams = new URLSearchParams(window.location.search);
     const ref = urlParams.get('ref');
 
-    // VERIFICAÇÃO INICIAL: SE É LINK DE INDICADO, PULA O LOGIN
-    window.onload = function() {
-        if (ref) {
-            const indicador = bancoPessoas.find(p => criarSlug(p.nome) === ref);
-            if (indicador) {
-                document.getElementById('telaBloqueio').style.display = 'none';
-                document.getElementById('areaCadastro').style.display = 'block';
-                document.getElementById('msgConvidado').innerText = "Você foi convidado por: " + indicador.nome;
-            }
-        }
-    }
-
-    function criarSlug(n) { return n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ''); }
+    window.onload = () => {
+        if(ref) document.getElementById('telaBloqueio').style.display = 'none';
+    };
 
     function verificarAcesso() {
         const t = document.getElementById('loginTitulo').value;
-        const p = bancoPessoas.find(x => x.titulo === t);
-
-        if (t === TITULO_MESTRE || p) {
+        const user = db.find(u => u.titulo === t);
+        if(t === MEU_TITULO || user) {
             document.getElementById('telaBloqueio').style.display = 'none';
-            document.getElementById('areaLink').style.display = 'block';
-            
-            if (t === TITULO_MESTRE) {
-                document.getElementById('areaAdmin').style.display = 'block';
-                document.getElementById('saudacao').innerText = "Painel Master - Azevedo";
-                document.getElementById('meuLink').innerText = window.location.href.split('?')[0] + "?ref=azevedo";
-                atualizarTabelaGeral();
-                renderizarHistorico();
+            if(t === MEU_TITULO) {
+                document.getElementById('conteudoAdmin').style.display = 'block';
+                document.getElementById('userGreeting').innerText = "Painel Administrador Master";
+                atualizarTudo();
             } else {
-                document.getElementById('saudacao').innerText = "Olá, " + p.nome;
-                document.getElementById('meuLink').innerText = window.location.href.split('?')[0] + "?ref=" + p.slug;
+                document.getElementById('userGreeting').innerText = "Painel do Líder: " + user.nome;
+                mostrarLink(user);
             }
-        } else { alert("Título não cadastrado!"); }
+        } else { alert("Acesso Negado."); }
     }
 
-    function cadastrar() {
-        const nome = document.getElementById('nome').value.trim();
-        const titulo = document.getElementById('titulo').value;
-        const cidade = document.getElementById('cidade').value;
+    function realizarCadastro() {
+        const dados = {
+            nome: document.getElementById('regNome').value,
+            cidade: document.getElementById('regCidade').value,
+            titulo: document.getElementById('regTitulo').value,
+            zona: document.getElementById('regZona').value,
+            secao: document.getElementById('regSecao').value,
+            data: new Date(),
+            lider: ref || "Direto",
+            slug: document.getElementById('regNome').value.toLowerCase().replace(/\s+/g, '')
+        };
 
-        if (!nome || !titulo) return alert("Preencha Nome e Título!");
-        if (bancoPessoas.some(x => x.titulo === titulo)) return alert("Já cadastrado!");
-
-        const novo = { nome, titulo, cidade, slug: criarSlug(nome), indicadoPor: ref || "direto" };
-        bancoPessoas.push(novo);
-        localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
-        
-        alert("Cadastrado! Agora use seu título no Login para entrar.");
-        location.search = ""; 
+        if(!dados.nome || !dados.titulo) return alert("Nome e Título obrigatórios!");
+        db.push(dados);
+        localStorage.setItem('eleitoral_db', JSON.stringify(db));
+        alert("Cadastrado com sucesso!");
+        mostrarLink(dados);
+        if(document.getElementById('conteudoAdmin').style.display === 'block') atualizarTudo();
     }
 
-    function atualizarTabelaGeral() {
-        const tbody = document.querySelector('#tabelaGeral tbody');
+    function atualizarTudo() {
+        renderTabela();
+        renderRankings();
+        renderEventos();
+    }
+
+    function renderTabela() {
+        const tbody = document.querySelector("#tabelaMaster tbody");
         tbody.innerHTML = "";
-        bancoPessoas.forEach(p => {
-            const indicados = bancoPessoas.filter(m => m.indicadoPor === p.slug).length;
-            const status = indicados >= 10 ? '<span class="status-ativo">ATIVO</span>' : '<span class="status-inativo">INATIVO</span>';
-            const lider = bancoPessoas.find(l => l.slug === p.indicadoPor);
-            const linha = tbody.insertRow();
-            linha.innerHTML = `<td>${status}</td><td><b>${p.nome}</b></td><td>${p.titulo}</td><td>${indicados}/10</td>
-            <td><span class="badge-lider">${lider ? lider.nome : 'Direto'}</span></td>
-            <td><button onclick="addEvento('${p.titulo}')" style="background:#28a745; font-size:10px; width:auto;">PRESENÇA</button>
-            <button onclick="excluir('${p.titulo}')" style="background:red; font-size:10px; width:auto; margin-left:5px;">X</button></td>`;
+        db.forEach((p, index) => {
+            const nIndicados = db.filter(x => x.lider === p.slug).length;
+            const status = nIndicados >= 10 ? '<span class="status" style="background:var(--success)">ATIVO</span>' : '<span class="status" style="background:var(--danger)">INATIVO</span>';
+            tbody.innerHTML += `<tr>
+                <td>${status}</td>
+                <td><b>${p.nome}</b></td>
+                <td>${p.cidade}</td>
+                <td>${p.titulo}</td>
+                <td>${p.zona} / ${p.secao}</td>
+                <td>${nIndicados}</td>
+                <td>${p.lider}</td>
+                <td><button onclick="excluir(${index})" style="background:var(--danger); padding:5px;">X</button></td>
+            </tr>`;
         });
     }
 
-    function addEvento(t) {
-        const p = bancoPessoas.find(x => x.titulo === t);
-        if (p && !listaEvento.some(e => e.titulo === t)) {
-            listaEvento.push(p);
-            localStorage.setItem('listaEvento', JSON.stringify(listaEvento));
-            renderEvento();
-        }
-    }
-
-    function renderEvento() {
-        const tbody = document.querySelector('#tabelaEvento tbody');
-        tbody.innerHTML = "";
-        listaEvento.forEach(p => {
-            tbody.innerHTML += `<tr><td>${p.nome}</td><td>${p.cidade}</td>
-            <td><button onclick="removerEv('${p.titulo}')" style="background:red; padding:2px;">Remover</button></td></tr>`;
+    function filtrarTabela() {
+        const termo = document.getElementById('filtroBusca').value.toLowerCase();
+        const linhas = document.querySelectorAll("#tabelaMaster tbody tr");
+        linhas.forEach(linha => {
+            linha.style.display = linha.innerText.toLowerCase().includes(termo) ? "" : "none";
         });
     }
 
-    function removerEv(t) {
-        listaEvento = listaEvento.filter(e => e.titulo !== t);
-        localStorage.setItem('listaEvento', JSON.stringify(listaEvento));
-        renderEvento();
+    function renderRankings() {
+        const calcularRank = (lista) => {
+            return lista.map(p => ({
+                nome: p.nome,
+                qtd: db.filter(x => x.lider === p.slug).length
+            })).sort((a,b) => b.qtd - a.qtd).slice(0,5);
+        };
+
+        const geral = calcularRank(db);
+        const anual = calcularRank(db.filter(p => new Date(p.data).getFullYear() === 2026));
+
+        document.getElementById('rankGeral').innerHTML = geral.map((p, i) => `<p>${i+1}º ${p.nome} - ${p.qtd} indicados</p>`).join('');
+        document.getElementById('rankAno').innerHTML = anual.map((p, i) => `<p>${i+1}º ${p.nome} - ${p.qtd} indicados</p>`).join('');
     }
 
     function salvarEvento() {
-        const n = document.getElementById('nomeEvento').value;
-        if(listaEvento.length === 0) return alert("Lista vazia!");
-        historico.push({ nome: n, data: new Date().toLocaleString(), total: listaEvento.length });
-        localStorage.setItem('historicoEventos', JSON.stringify(historico));
-        listaEvento = [];
-        localStorage.setItem('listaEvento', "[]");
-        renderEvento();
-        renderizarHistorico();
-        alert("Evento salvo!");
+        eventos.push({ nome: document.getElementById('evNome').value, data: document.getElementById('evData').value });
+        localStorage.setItem('eleitoral_ev', JSON.stringify(eventos));
+        renderEventos();
     }
 
-    function renderizarHistorico() {
-        const h = document.getElementById('listaHistorico');
-        h.innerHTML = "";
-        historico.slice().reverse().forEach(ev => {
-            h.innerHTML += `<div style="background:#f8f9fa; border-left:5px solid #007bff; padding:10px; margin-top:5px;">
-                <strong>${ev.data}</strong> - ${ev.nome} (${ev.total} presentes)
-            </div>`;
-        });
+    function renderEventos() {
+        document.getElementById('listaEventos').innerHTML = eventos.map(e => `<div>📅 ${e.data} - <b>${e.nome}</b></div>`).join('');
     }
 
-    function excluir(t) {
-        if(confirm("Excluir?")) {
-            bancoPessoas = bancoPessoas.filter(p => p.titulo !== t);
-            localStorage.setItem('bancoPessoas', JSON.stringify(bancoPessoas));
-            atualizarTabelaGeral();
-        }
+    function mostrarLink(u) {
+        document.getElementById('boxLink').style.display = 'block';
+        document.getElementById('txtLink').innerText = window.location.href.split('?')[0] + "?ref=" + u.slug;
     }
 
-    function exportarExcel() {
-        let csv = "Nome;Cidade;Titulo\n";
-        listaEvento.forEach(p => csv += `${p.nome};${p.cidade};${p.titulo}\n`);
-        const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "lista.csv";
-        a.click();
-    }
-
-    function copiarLink() {
-        navigator.clipboard.writeText(document.getElementById('meuLink').innerText);
-        alert("Link copiado!");
-    }
-
-    renderEvento();
+    function excluir(i) { if(confirm("Excluir?")) { db.splice(i,1); localStorage.setItem('eleitoral_db', JSON.stringify(db)); atualizarTudo(); } }
+    function copiarLink() { navigator.clipboard.writeText(document.getElementById('txtLink').innerText); alert("Copiado!"); }
 </script>
 </body>
 </html>
